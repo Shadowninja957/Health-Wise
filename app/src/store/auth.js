@@ -4,7 +4,9 @@ export default{
     namespaced: true,
 
     state: {
-        authenticated: sessionStorage.authenticated || false,
+        authenticated: sessionStorage.getItem('Authenticated') || false,
+        // authenticated: false,
+        userId: sessionStorage.getItem('UserId') || null,
         credentials: {},
     },
 
@@ -17,6 +19,11 @@ export default{
         getCredentials (state)
         {
             return state.credentials
+        },
+
+        getUserId (state)
+        {
+            return state.userId
         }
     },
 
@@ -29,6 +36,11 @@ export default{
         setCredentials (state, value)
         {
             state.credentials = value
+        },
+
+        setUserId (state, value)
+        {
+            state.userId = value
         }
     },
 

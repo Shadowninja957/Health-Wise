@@ -72,13 +72,19 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 export default {
     data: () => ({
         show: false,
         email: "",
         password: "",
     }),
+
+    computed: {
+        ...mapGetters({
+            authenticated: 'auth/getAuthenticated',
+        })
+    },
 
     methods: {
         ...mapActions({
@@ -88,6 +94,7 @@ export default {
         ...mapMutations({
             setCredentials: 'auth/setCredentials',
             setAuthenticated: 'auth/setAuthenticated',
+            setUserId: 'auth/setUserId',
         }),
 
         back ()
@@ -109,9 +116,13 @@ export default {
                     password: this.password
                 })
                 try {
-                    const response = await this.logIn();
-                    console.log(response);
+                    const { data } = await this.logIn();
+                    //console.log(`User ID: ${data.data[0].user_id}`);
+                    this.setUserId(data.data[0].user_id);
+                    sessionStorage.setItem('UserId', data.data[0].user_id);
                     this.setAuthenticated(true);
+                    // console.log(`Authenticated: ${this.authenticated}`);
+                    sessionStorage.setItem('Authenticated', "true");
                     this.$router.replace('/home')
                 } catch (error) {
                     if(error.response) console.log(error.response);

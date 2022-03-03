@@ -9,12 +9,12 @@
     
     include_once '../config/database.php';
 
-    include_once '../objects/user.php';
+    include_once '../objects/appointment.php';
 
     $database = new Database();
     $conn = $database->getConnection();
 
-    $user = new User($conn);
+    $appointment = new Appointment($conn);
 
     $data = json_decode(file_get_contents("php://input"));
     
@@ -27,33 +27,37 @@
 
     
     if(
-        !empty($data->user_name)&&
-        !empty($data->password)       
+        !empty($data->patient_id)&&
+        !empty($data->doctor_id)&&
+        !empty($data->date)&&
+        !empty($data->time)       
     ){
-        $user->user_name = $data->user_name;
-        $user->password = $data->password;
-        $user->role_id = $data->role_id;
+        $appointment->patient_id = $data->patient_id;
+        $appointment->doctor_id = $data->doctor_id;
+        $appointment->date = $data->date;
+        $appointment->time = $data->time;
+        $appointment->details = $data->details;
 
         
 
-        if($user->create()){
+        if($appointment->create()){
 
             http_response_code(201);
 
-            echo json_encode(array("message"=>"User added."));
+            echo json_encode(array("message"=>"Appointment created."));
         }
         else{
 
             http_response_code(503);
 
-            echo json_encode(array("message"=>"Unable to add User."));
+            echo json_encode(array("message"=>"Unable to Create appointment."));
         }
     }
     else{
 
         http_response_code(400);
 
-        echo json_encode(array("message"=>"Unable to add record. Data is incomplete."));
+        echo json_encode(array("message"=>"Unable to create appointment. Data is incomplete."));
     }
 
     

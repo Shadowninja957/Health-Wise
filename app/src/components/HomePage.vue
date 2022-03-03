@@ -1,86 +1,48 @@
 <template>
     <v-app>
-        <v-app-bar
-        app
-        color="white"
-        
-        flat
-        >
-        <div class="d-flex align-center font-weight-bold">
-            <v-btn 
-                text
-                @click="landingPage"
-            >Health Wise</v-btn>
-        </div>
+        <top-navigation></top-navigation>
 
-        <v-spacer></v-spacer>
-        <v-btn
-            class="mr-2"
-            text
-            color="primary"
-        >
-            Home
-        </v-btn>
-        <v-btn
-            text
-        >
-            Find a doctor
-        </v-btn>
-        <v-btn
-            text
-        >
-            Diagnosis
-        </v-btn>
-        <v-btn
-            text
-        >
-            Appointment
-        </v-btn>
-        <v-btn
-            text
-        >
-            Feedback Form
-        </v-btn>
-        
-        </v-app-bar>
-
-        <v-main>
-            <v-container fluid class="fill-height justify center container-background">
-                <v-row class="text-center">
-                    <v-col>
-                        <v-card 
-                            max-width="300"
-                            flat                            
-                            class="mx-auto"
-                        >
-                            <v-card-title class="justify-center font-weight-bold">Diagnosis</v-card-title>
-                            <v-card-text>
-                                <v-autocomplete
-                                    v-model="symptom"
-                                    :items="symptoms"
-                                    chips
-                                    multiple
-                                    outlined
-                                    dense
-                                    item-text="detail"
-                                    item-value="id"
-                                ></v-autocomplete>
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-btn color="primary" depressed block>
-                                    Diagnose
-                                </v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-container>
-        </v-main>
+        <layout-page>
+            <v-row class="text-center">
+                <v-col>
+                    <v-card 
+                        max-width="300"
+                        flat                            
+                        class="mx-auto"
+                    >
+                        <v-card-title class="justify-center font-weight-bold">Diagnosis</v-card-title>
+                        <v-card-text>
+                            <v-autocomplete
+                                v-model="symptom"
+                                :items="symptoms"
+                                chips
+                                multiple
+                                outlined
+                                dense
+                                item-text="detail"
+                                item-value="id"
+                            ></v-autocomplete>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-btn color="primary" depressed block>
+                                Diagnose
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </layout-page>   
     </v-app>
 </template>
 
 <script>
+import TopNavigation from './TopNavigation.vue';
+import LayoutPage from './LayoutPage.vue';
 export default {
+    components: {
+        TopNavigation,
+        LayoutPage,
+    },
     data: () => ({
         symptom: "",
         symptoms: [
@@ -92,26 +54,8 @@ export default {
     }),
 
     methods: {
-        landingPage () 
-        {
-            console.log("landing page")
-            this.$router.replace('/')
-        }
+       //
     }
 }
 </script>
 
-<style scoped>
-    .container-background{
-        background-image: url("../assets/Vector.svg");
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        filter:brightness(103%);
-        position: absolute;
-    }
-
-    ::v-deep .theme--light.v-card{
-        background-color:transparent;
-    }
-</style>

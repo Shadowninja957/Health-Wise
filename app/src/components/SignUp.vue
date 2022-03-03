@@ -85,7 +85,6 @@ export default {
 
         ...mapMutations({
             setCredentials: 'auth/setCredentials',
-            setAuthenticated: 'auth/setAuthenticated',
         }),
 
         back ()
@@ -105,8 +104,6 @@ export default {
                 })
                 try {
                     const response = await this.newUser();
-                    this.setAuthenticated(true);
-                    this.$router.replace('/home')
                     console.log(response);
                 } catch (error) {
                     if(error.response) console.log(error.response)

@@ -4,6 +4,8 @@ import LandingPage from '../components/LandingPage'
 import LogIn from '../components/LogIn'
 import SignUp from '../components/SignUp'
 import HomePage from '../components/HomePage'
+import DoctorPage from '../components/DoctorPage'
+import AppointmentPage from '../components/AppointmentPage'
 import store from '../store'
 
 Vue.use(VueRouter);
@@ -40,7 +42,23 @@ const routes = [
       meta: {
         requiresAuth: true,
       }
-    }
+    },
+    {
+      path: '/doctors',
+      name: 'Doctors',
+      component: DoctorPage,
+      meta: {
+        requiresAuth: true,
+      }
+    },
+    {
+      path: '/appointments',
+      name: 'Appointments',
+      component: AppointmentPage,
+      meta: {
+        requiresAuth: true,
+      }
+    },
 ]
 
 const router = new VueRouter({
@@ -53,7 +71,7 @@ const router = new VueRouter({
     if (to.matched.some(record => record.meta.requiresAuth)) {
       // this route requires auth, check if logged in
       // if not, redirect to login page.
-      //console.log("Authenticated: ", store.getters['auth/authenticated']);
+      console.log("Authenticated: ", store.getters['auth/getAuthenticated']);
       if (!store.getters['auth/getAuthenticated']) {
         next({
           path: '/login',

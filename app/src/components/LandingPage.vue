@@ -60,3 +60,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  body{
+    background: #E5E5E5;
+  }
+</style>

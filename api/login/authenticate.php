@@ -34,9 +34,21 @@
         if($num > 0){
                
             http_response_code(200);
+
+            $data = [];
+
+            while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+            
+                extract($row);
+    
+                $data[] = array(
+                    "user_id" => $id,
+                );
+    
+            }
     
             echo json_encode(
-                array("message" => "User Authenticated.")
+                array("message" => "User Authenticated.", "data" => $data)
             );
         }
         else{
