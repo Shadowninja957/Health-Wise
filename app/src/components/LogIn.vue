@@ -88,13 +88,20 @@ export default {
 
     methods: {
         ...mapActions({
-            logIn: 'auth/logIn'
+            logIn: 'auth/logIn',
+            getPatient: 'auth/getPatient',
+            getDoctor: 'auth/getDoctor',
         }),
 
         ...mapMutations({
             setCredentials: 'auth/setCredentials',
             setAuthenticated: 'auth/setAuthenticated',
             setUserId: 'auth/setUserId',
+            setUser: 'auth/setUser',
+            setUserEmail: 'auth/setUserEmail',
+            setDoctor: 'auth/setDoctor',
+            setDoctorId: 'auth/setDoctorId',
+            setPatientId: 'auth/setPatientId',
         }),
 
         back ()
@@ -117,13 +124,41 @@ export default {
                 })
                 try {
                     const { data } = await this.logIn();
-                    //console.log(`User ID: ${data.data[0].user_id}`);
+                    // console.log(`User ID: ${data.data[0].user_id}`);
                     this.setUserId(data.data[0].user_id);
                     sessionStorage.setItem('UserId', data.data[0].user_id);
+                    this.setUserEmail(this.email);
+                    sessionStorage.setItem('UserEmail', this.email);
                     this.setAuthenticated(true);
+                    let dataUser = null;
+                    console.log(`RoleID: ${data.data[0].role_id}`)
+                    if(data.data[0].role_id == 2){
+                        const { data } = await this.getDoctor();
+                        // console.log(data);
+                        dataUser = data;
+                        this.setUser(dataUser[0]);
+                        sessionStorage.setItem('User', JSON.stringify(dataUser[0]));
+                        sessionStorage.setItem('Authenticated', "true");
+                        this.setDoctor(true);
+                        this.setDoctorId(dataUser[0].id);
+                        sessionStorage.setItem('DoctorId',dataUser[0].id )
+                        sessionStorage.setItem('Doctor', true);
+                        this.$router.replace('/appointments')
+                    } 
+                    else{
+                        const { data } = await this.getPatient();
+                        dataUser = data;
+                        // console.log(dataUser);
+                        this.setUser(dataUser[0]);
+                        sessionStorage.setItem('User', JSON.stringify(dataUser[0]));
+                        sessionStorage.setItem('Authenticated', "true");
+                        this.setPatientId(dataUser[0].id);
+                        sessionStorage.setItem('PatientId',dataUser[0].id )
+                        this.$router.replace('/home')
+                    } 
+                    
                     // console.log(`Authenticated: ${this.authenticated}`);
-                    sessionStorage.setItem('Authenticated', "true");
-                    this.$router.replace('/home')
+                    
                 } catch (error) {
                     if(error.response) console.log(error.response);
                     else console.log(error);

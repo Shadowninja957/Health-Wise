@@ -22,7 +22,7 @@ export default{
     actions: {
         getDoctors ()
         {
-            const url = '/doctor/read';
+            const url = '/doctor/readDoctors';
             return axios.get(url);
         }       
     }

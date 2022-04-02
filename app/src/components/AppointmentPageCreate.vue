@@ -89,6 +89,7 @@ export default {
             doctor: 'doctor/getSelectedDoctor',
             userId: 'auth/getUserId',
             appointmentDetails: 'appointment/getAppointmentDetails',
+            patientId: 'auth/getPatientId',
         }),
 
         
@@ -104,17 +105,22 @@ export default {
             setAppointment: 'appointment/setAppointment',
         }),
 
-        allowedDates (val) {
-            let selectedMonth = parseInt(val.split('-')[1]);
-            let selectedDay = parseInt(val.split('-')[2]);
-            let today = new Date();
-            if(selectedMonth >= today.getMonth() && selectedDay >= today.getDate())
-            return true
-            return false
+        allowedDates () {
+            // let selectedMonth = parseInt(val.split('-')[1]);
+            // let selectedDay = parseInt(val.split('-')[2]);
+            // let today = new Date();
+            // if(selectedMonth >= today.getMonth() && selectedDay >= today.getDate()){
+            //     console.log("true")
+            //     return true
+            // }
+            
+            // return false
+            // console.log(val);
+            return true;
         },
 
         async makeAppointment () {
-            this.appointment.patient_id = this.userId;
+            this.appointment.patient_id = this.patientId;
             this.appointment.doctor_id = this.doctor.id;
             this.appointment.date = this.date;
             this.$emit("loading", true);

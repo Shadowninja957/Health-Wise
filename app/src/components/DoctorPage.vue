@@ -57,18 +57,13 @@
                                 <div>{{ doctor.work_hours }}</div>
                             </v-card-text>
                             <v-card-actions class="d-flex justify-center">
-                                <v-btn
-                                    color="primary"
-                                    dark
-                                    small
-                                >
-                                    Show Location
-                                </v-btn>
+                                <google-maps buttonText="Show Location"></google-maps>
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     color="primary"
                                     dark
                                     small
+                                    rounded
                                     @click="makeAppointment(doctor)"
                                 >
                                     Make Appointment
@@ -95,11 +90,13 @@
 <script>
 import TopNavigation from './TopNavigation.vue';
 import LayoutPage from './LayoutPage.vue';
+import GoogleMaps from './GoogleMaps.vue'
 import { mapActions, mapMutations } from 'vuex';
 export default {
     components: {
         TopNavigation,
         LayoutPage,
+        GoogleMaps,
     },
 
     created: function () {
