@@ -7,10 +7,12 @@ export default{
         authenticated: sessionStorage.getItem('Authenticated') || false,
         // authenticated: false,
         userId: sessionStorage.getItem('UserId') || null,
+        userEmail: sessionStorage.getItem('UserEmail') || null,
         patientId: sessionStorage.getItem('PatientId') || null,
         doctorId: sessionStorage.getItem('DoctorId') || null,
         credentials: {},
-        patient: sessionStorage.getItem('Patient') || null,
+        user: sessionStorage.getItem('User') || null,
+        doctor: sessionStorage.getItem('Doctor') || null,
     },
 
     getters: {
@@ -39,9 +41,19 @@ export default{
             return state.doctorId
         },
 
-        getPatient (state)
+        getUser (state)
         {
-            return state.patient
+            return state.user
+        },
+
+        getUserEmail (state)
+        {
+            return state.userEmail
+        },
+
+        getDoctor (state)
+        {
+            return state.doctor
         }
     },
 
@@ -71,9 +83,19 @@ export default{
             state.doctorId = value
         },
 
-        setPatient (state, value)
+        setUser (state, value)
         {
-            state.patient = value
+            state.user = value
+        },
+
+        setUserEmail (state, value)
+        {
+            state.userEmail = value
+        },
+
+        setDoctor (state, value)
+        {
+            state.doctor = value
         }
     },
 
@@ -94,7 +116,9 @@ export default{
         {
             const url = '/patient/create'
             return axios.post(url, {
-                user_id: getters.getUserId
+                user_id: getters.getUserId,
+                first_name: getters.getCredentials.first_name,
+                last_name: getters.getCredentials.last_name 
             })
         },
 
@@ -102,8 +126,28 @@ export default{
         {
             const url = '/patient/read'
             return axios.post(url, {
-                user_id: getters.getUserId 
+                user_id: getters.getUserId,
+                
             });
+        },
+
+        postDoctor({ getters })
+        {
+            const url = '/doctor/create'
+            console.log(getters.getUserId);
+            return axios.post(url, {
+                user_id: getters.getUserId,
+                first_name: getters.getCredentials.first_name,
+                last_name: getters.getCredentials.last_name
+            })
+        },
+
+        getDoctor({ getters })
+        {
+            const url = '/doctor/read'
+            return axios.post(url, {
+                user_id: getters.getUserId,
+            })
         }
     }
 }

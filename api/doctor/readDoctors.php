@@ -2,7 +2,6 @@
 
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");
-    header("Access-Control-Allow-Headers: Origin, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
     include_once '../config/database.php';    
     include_once '../objects/doctor.php';
@@ -12,18 +11,9 @@
     
 
     $doctor = new Doctor($conn);
-    $data = json_decode(file_get_contents("php://input"));
-    $doctor->user_id = $data->user_id;
-
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        // The request is using the POST method
-        header("HTTP/1.1 200 OK");
-        return;
-    
-    }
     
 
-    $stmt = $doctor->read();
+    $stmt = $doctor->readDoctors();
     $num = $stmt->rowCount();
 
 
@@ -40,19 +30,14 @@
 
             $records[] = array(
                 "id" => $id,
-                "name" => $first_name.' '.$last_name,
-                "first_name" => $first_name,
-                "last_name" => $last_name,
-                "date_of_birth" => $date_of_birth,
-                "gender" => $gender,                
+                "name" => $first_name.' '.$last_name,                
                 "age" => $age->format("%y"),
                 "work_address" => $work_address,
                 "email_address" => $email_address,
                 "work_number" => $work_number,
-                "speciality_id" => $speciality_id,
+                "speciality" => $detail,
                 "location_lat" => $location_lat,
                 "location_lng" => $location_lng,
-                "role_id" => 2,
             );
 
         }

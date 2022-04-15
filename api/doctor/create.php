@@ -9,12 +9,12 @@
     
     include_once '../config/database.php';
 
-    include_once '../objects/feedback.php';
+    include_once '../objects/doctor.php';
 
     $database = new Database();
     $conn = $database->getConnection();
 
-    $feedback = new Feedback($conn);
+    $doctor = new Doctor($conn);
 
     $data = json_decode(file_get_contents("php://input"));
     
@@ -27,40 +27,32 @@
 
     
     if(
-        !empty($data->name)&&
-        !empty($data->email)&&
-        !empty($data->contact)&&
-        !empty($data->doctor)&&
-        !empty($data->subject)&&
-        !empty($data->description)       
+        !empty($data->user_id)
     ){
-        $feedback->patient_id = $data->patient_id;
-        $feedback->name = $data->name;
-        $feedback->email = $data->email;
-        $feedback->contact = $data->contact;
-        $feedback->doctor = $data->doctor;
-        $feedback->subject = $data->subject;
-        $feedback->description = $data->description;
-        
+        $doctor->user_id = $data->user_id;
+        $doctor->first_name = $data->first_name;
+        $doctor->last_name = $data->last_name;
+        // $doctor->contact_number = $data->contact_number;
+        // $doctor->address = $data->address;
 
-        if($feedback->create()){
+        if($doctor->create()){
 
             http_response_code(201);
 
-            echo json_encode(array("message"=>"Feedback created."));
+            echo json_encode(array("message"=>"Doctor added."));
         }
         else{
 
             http_response_code(503);
 
-            echo json_encode(array("message"=>"Unable to Create feedback."));
+            echo json_encode(array("message"=>"Unable to add Doctor."));
         }
     }
     else{
 
         http_response_code(400);
 
-        echo json_encode(array("message"=>"Unable to create feedback. Data is incomplete."));
+        echo json_encode(array("message"=>"Unable to add record. Data is incomplete."));
     }
 
     

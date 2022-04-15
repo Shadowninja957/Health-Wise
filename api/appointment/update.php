@@ -9,12 +9,12 @@
     
     include_once '../config/database.php';
 
-    include_once '../objects/feedback.php';
+    include_once '../objects/appointment.php';
 
     $database = new Database();
     $conn = $database->getConnection();
 
-    $feedback = new Feedback($conn);
+    $appointment = new Appointment($conn);
 
     $data = json_decode(file_get_contents("php://input"));
     
@@ -22,45 +22,35 @@
         // The request is using the POST method
         header("HTTP/1.1 200 OK");
         return;
-    
     }
-
     
     if(
-        !empty($data->name)&&
-        !empty($data->email)&&
-        !empty($data->contact)&&
-        !empty($data->doctor)&&
-        !empty($data->subject)&&
-        !empty($data->description)       
+        !empty($data->id)&&
+        !empty($data->date)&&
+        !empty($data->time)       
     ){
-        $feedback->patient_id = $data->patient_id;
-        $feedback->name = $data->name;
-        $feedback->email = $data->email;
-        $feedback->contact = $data->contact;
-        $feedback->doctor = $data->doctor;
-        $feedback->subject = $data->subject;
-        $feedback->description = $data->description;
+        $appointment->id = $data->id;
+        $appointment->date = $data->date;
+        $appointment->time = $data->time;
         
+        if($appointment->update()){
 
-        if($feedback->create()){
+            http_response_code(200);
 
-            http_response_code(201);
-
-            echo json_encode(array("message"=>"Feedback created."));
+            echo json_encode(array("message"=>"Appointment updated."));
         }
         else{
 
             http_response_code(503);
 
-            echo json_encode(array("message"=>"Unable to Create feedback."));
+            echo json_encode(array("message"=>"Unable to Create appointment."));
         }
     }
     else{
 
         http_response_code(400);
 
-        echo json_encode(array("message"=>"Unable to create feedback. Data is incomplete."));
+        echo json_encode(array("message"=>"Unable to create appointment. Data is incomplete."));
     }
 
     

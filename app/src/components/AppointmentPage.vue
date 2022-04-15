@@ -25,7 +25,7 @@
 <script>
 import TopNavigation from './TopNavigation.vue';
 import LayoutPage from './LayoutPage.vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapMutations } from 'vuex';
 import AppointmentCreate from './AppointmentPageCreate.vue';
 import AppointmentView from './AppointmentPageView.vue';
 export default {
@@ -65,6 +65,10 @@ export default {
             }
             this.overlay = false;
         },
+
+        ...mapMutations({
+            //
+        }),
 
         loading (value) {
             this.overlay = value;

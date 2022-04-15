@@ -43,6 +43,7 @@
     
                 $data[] = array(
                     "user_id" => $id,
+                    "role_id" => $role_id,
                 );
     
             }

@@ -9,12 +9,12 @@
     
     include_once '../config/database.php';
 
-    include_once '../objects/feedback.php';
+    include_once '../objects/feedbackReplies.php';
 
     $database = new Database();
     $conn = $database->getConnection();
 
-    $feedback = new Feedback($conn);
+    $feedbackReplies = new FeedbackReplies($conn);
 
     $data = json_decode(file_get_contents("php://input"));
     
@@ -27,40 +27,32 @@
 
     
     if(
-        !empty($data->name)&&
-        !empty($data->email)&&
-        !empty($data->contact)&&
-        !empty($data->doctor)&&
-        !empty($data->subject)&&
-        !empty($data->description)       
+        !empty($data->patient_feedback_id)&&
+        !empty($data->detail)      
     ){
-        $feedback->patient_id = $data->patient_id;
-        $feedback->name = $data->name;
-        $feedback->email = $data->email;
-        $feedback->contact = $data->contact;
-        $feedback->doctor = $data->doctor;
-        $feedback->subject = $data->subject;
-        $feedback->description = $data->description;
-        
+        $feedbackReplies->patient_feedback_id = $data->patient_feedback_id;
+        $feedbackReplies->detail = $data->detail;
+        $feedbackReplies->patient_id = $data->patient_id;
+        $feedbackReplies->doctor_id = $data->doctor_id;
 
-        if($feedback->create()){
+        if($feedbackReplies->create()){
 
             http_response_code(201);
 
-            echo json_encode(array("message"=>"Feedback created."));
+            echo json_encode(array("message"=>"Feedback reply created."));
         }
         else{
 
             http_response_code(503);
 
-            echo json_encode(array("message"=>"Unable to Create feedback."));
+            echo json_encode(array("message"=>"Unable to Create feedback reply."));
         }
     }
     else{
 
         http_response_code(400);
 
-        echo json_encode(array("message"=>"Unable to create feedback. Data is incomplete."));
+        echo json_encode(array("message"=>"Unable to create feedback reply. Data is incomplete."));
     }
 
     

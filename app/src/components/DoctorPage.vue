@@ -57,18 +57,17 @@
                                 <div>{{ doctor.work_hours }}</div>
                             </v-card-text>
                             <v-card-actions class="d-flex justify-center">
-                                <v-btn
-                                    color="primary"
-                                    dark
-                                    small
-                                >
-                                    Show Location
-                                </v-btn>
+                                <google-maps 
+                                    buttonText="Show Location"
+                                    :lat="doctor.location_lat"
+                                    :lng="doctor.location_lng"
+                                ></google-maps>
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     color="primary"
                                     dark
                                     small
+                                    rounded
                                     @click="makeAppointment(doctor)"
                                 >
                                     Make Appointment
@@ -95,11 +94,13 @@
 <script>
 import TopNavigation from './TopNavigation.vue';
 import LayoutPage from './LayoutPage.vue';
+import GoogleMaps from './GoogleMaps.vue'
 import { mapActions, mapMutations } from 'vuex';
 export default {
     components: {
         TopNavigation,
         LayoutPage,
+        GoogleMaps,
     },
 
     created: function () {
@@ -120,17 +121,21 @@ export default {
 
         ...mapMutations({
             setDoctor: 'doctor/setSelectedDoctor',
+            setTab: 'navigation/setTab',
         }),
 
         async initialize () {
             console.log('doctors initializing..');
+            this.setTab(2);
             this.overlay = true;
             try {
                 const { data } = await this.getDoctors();
+                // console.log(data);
                 this.doctors = data;
                 this.doctorsSearch = data;
             } catch (error) {
-                console.log(error);
+                if(error.response) console.log(error.response)
+                else console.log(error);
             }
             this.overlay = false;
         },

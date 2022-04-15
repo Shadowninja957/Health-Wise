@@ -8,6 +8,7 @@ import DoctorPage from '../components/DoctorPage'
 import AppointmentPage from '../components/AppointmentPage'
 import FeedbackForm from '../components/FeedbackForm'
 import FeedbackView from '../components/FeedbackView'
+import DiagnosisPage from '../components/DiagnosisPage';
 import store from '../store'
 
 Vue.use(VueRouter);
@@ -73,6 +74,14 @@ const routes = [
       path: '/feedback-view',
       name: 'FeedbackView',
       component: FeedbackView,
+      meta: {
+        requiresAuth: true,
+      }
+    },
+    {
+      path: '/diagnosis',
+      name: 'Diagnosis',
+      component: DiagnosisPage,
       meta: {
         requiresAuth: true,
       }

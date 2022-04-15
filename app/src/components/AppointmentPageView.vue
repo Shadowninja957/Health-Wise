@@ -3,7 +3,10 @@
          <v-row justify="center">
             <h1>View Appointments</h1>
         </v-row>
-        <v-row class="text-center">
+        <v-row
+            v-if="patientId" 
+            class="text-center"
+        >
             <v-col>
                 <v-card 
                     flat
@@ -21,18 +24,22 @@
         </v-row>
 
         
-        <v-row >
+        <v-row v-if="patientId">
             <v-col 
                 
                 v-for="appointment in appointments"
                 :key="appointment.id"
             >
-                <v-card width="350" >
+                <v-card 
+                    width="350" 
+                    :color="appointment.cancel == 1 ? 'red lighten-3' : 'white'"
+                
+                >
                     <v-system-bar 
-                        color="primary"
+                        :color="appointment.cancel == 1 ? 'red' : 'primary'"
                         dark
                     >
-                        Appointment Card
+                        {{ appointment.cancel == 1 ? "Appointment Card - Cancelled" : "Appointment Card"}}
                     </v-system-bar>
                     <v-card-title>
                         <v-avatar
@@ -42,7 +49,7 @@
                         >
                             <v-img :src="require('../assets/stethoscope.png')"></v-img>
                         </v-avatar>
-                        {{ appointment.name }}
+                        Dr. {{ appointment.name }}
                     </v-card-title>
                     <v-card-text>
                         <div>Specialization: {{ appointment.speciality }}</div>
@@ -63,28 +70,31 @@
                             block
                             class="mb-3"
                             rounded
+                            @click="reschedule(appointment)"
+                            :disabled="appointment.cancel == 1 ? true : false"
                         >
                             Reschedule Appointment
                         </v-btn>
 
-                        <v-btn
-                            color="primary"
-                            dark
-                            small
-                            block
-                            class="mb-3 ml-0"
-                            rounded
-                        >
-                            View Doctor Location
-                        </v-btn>
+                        
+                            
+                        <google-maps
+                            buttonText="View Doctor Location"
+                            :block=true
+                            :disabled="appointment.cancel == 1 ? true : false"
+                            :lat="appointment.location_lat"
+                            :lng="appointment.location_lng"
+                        ></google-maps>                      
                         
                         <v-btn
                             color="red"
                             dark
                             small
                             block
-                            class="ml-0"
+                            class="ml-0 mt-3"
                             rounded
+                            @click="cancelAppointment(appointment)"
+                            :disabled="appointment.cancel == 1 ? true : false"
                         >
                             Cancel Appointment
                         </v-btn>
@@ -94,6 +104,24 @@
                 </v-card>
             </v-col>
         </v-row>
+
+        <appointment-doctor
+            v-if="doctorId"
+            :appointmentsAll="appointments"
+        ></appointment-doctor>
+
+        <appointment-reschedule
+            :openDialog="dialogReschedule"
+            :appointment="rescheduleAppointment"
+            @close-reschedule="closeReschedule"
+        ></appointment-reschedule>
+
+        <appointment-cancel
+            :openDialog="dialogCancel"
+            :appointmentCancel="appointmentSelected"
+            @close-cancel="closeCancel"
+            @appointment-cancelled="appointmentCancelled"
+        ></appointment-cancel>
             
         
     </v-container>
@@ -101,14 +129,38 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
+import GoogleMaps from './GoogleMaps.vue';
+import AppointmentReschedule from './AppointmentReschedule.vue';
+import AppointmentCancel from './AppointmentCancel.vue';
+import AppointmentDoctor from './AppointmentDoctor.vue';
 export default {
+    components: {
+        GoogleMaps,
+        AppointmentReschedule,
+        AppointmentCancel,
+        AppointmentDoctor
+    },
+
     created: function () {
         this.initialize();
     },
 
+    computed: {
+        ...mapGetters({
+            doctorId: 'auth/getDoctorId',
+            patientId: 'auth/getPatientId',
+        })
+    },
+
     data: () => ({
         appointments: [],
+        dialogReschedule: false,
+        dialogCancel: false,
+        rescheduleAppointment: {},
+        appointmentSelected: {
+            cancel: 0,
+        },
     }),
 
     methods: {
@@ -117,16 +169,46 @@ export default {
         }),
 
         async initialize () {
+            console.log(`Dr ID: ${this.doctorId}`);
+            console.log(`Paitent ID: ${this.patientId}`);
             this.$emit("loading", true);
-            console.log('initializing appointments...');
+            // console.log('initializing appointments...');
             try {
                 const { data } = await this.getAppointments();
+                console.log(data);
                 this.appointments = data;
             } catch (error) {
                 console.log(error);
+                console.log(error.response);
             }
             this.$emit("loading", false)
+        },
+
+        reschedule (appointment) {
+            this.rescheduleAppointment = appointment;
+            console.log(this.rescheduleAppointment);            
+            this.dialogReschedule = true;
+        },
+
+        closeReschedule () {
+            this.dialogReschedule = false;
+        },
+
+        cancelAppointment (appointment) {
+            console.log('cancelling...');
+            this.appointmentSelected = appointment;
+            this.dialogCancel = true;
+        },
+
+        closeCancel () {
+            this.dialogCancel = false;
+        },
+
+        appointmentCancelled () {
+            this.appointmentSelected.cancel = 1;
         }
+
+        
     }
 
 

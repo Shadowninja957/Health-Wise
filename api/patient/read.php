@@ -41,6 +41,7 @@
                 "last_name" => $last_name,                
                 "contact_number" => $contact_number,
                 "address" => $address,
+                "role_id" => 1,
             );
 
         }

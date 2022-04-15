@@ -74,14 +74,17 @@
 
                         <v-row>
                             <v-col>
-                                <v-text-field
+                                <v-select
                                     v-model="feedback.doctor"
-                                    label="Doctor Name:"
+                                    label="Doctor:"
+                                    :items="doctors"
+                                    item-text="name"
+                                    item-value="id"
                                     outlined
                                     clearable
                                     hide-details
                                     :rules="[ v => !!v || 'Item is required']"
-                                ></v-text-field>
+                                ></v-select>
                             </v-col>
                         </v-row>
 
@@ -165,34 +168,48 @@ export default {
        successMessage: null,
        valid: true,
        overlay: false,
+       doctors: [],
    }),
 
    computed: {
        ...mapGetters({
-           getPatient: 'auth/getPatient',
+           getUser: 'auth/getUser',
+           userEmail: 'auth/getUserEmail',
        })
    },
 
    methods: {
-       initialize () {
-            console.log('initializing feedback form...');
-            let patient = JSON.parse(this.getPatient);
-            if(this.feedback.name)
-            this.feedback.name = patient.first_name + " " + patient.last_name;
-            this.feedback.patient_id = patient.id;
+       async initialize () {
+           console.log('initializing feedback form...');
+           this.setTab(4)
+           this.overlay = true;
+           let user = JSON.parse(this.getUser);
+           console.log(user);
+           this.feedback.name = user.first_name + " " + user.last_name;
+           this.feedback.patient_id = user.id;
+           this.feedback.email = this.userEmail;
+           try {
+               const { data } = await this.getDoctors();
+               this.doctors = data;
+           } catch (error) {    
+               if(error.response) console.log(error.response);
+               else console.log(error);
+           }
+           this.overlay = false;
        },
 
        ...mapMutations({
            setFeedback: 'feedback/setFeedback',
+           setTab: 'navigation/setTab',
        }),
 
        ...mapActions({
            postFeedback: 'feedback/postFeedback',
+           getDoctors: 'doctor/getDoctors',
        }),
 
        validate () {
            let formHasErrors = false;
-           console.log(this.feedback);
            Object.keys(this.feedback).forEach(key => {
                if(!this.feedback[key]) formHasErrors = true;
            })

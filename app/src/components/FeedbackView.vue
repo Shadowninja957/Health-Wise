@@ -11,6 +11,7 @@
             >
                 <feedback-card
                     v-bind:feedback="feedback"
+                    v-on:refresh-feedback="getFeedbackRecords"
                 ></feedback-card>
             </v-col>
         </v-row>
@@ -32,7 +33,7 @@
 import TopNavigation from './TopNavigation.vue';
 import LayoutPage from './LayoutPage.vue';
 import FeedbackCard from './FeedbackViewCard.vue';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 export default {
    components: {
        TopNavigation,
@@ -59,6 +60,7 @@ export default {
    methods: {
        initialize () {
            console.log('initializing feedback view...');
+           this.setTab(4);
            this.overlay = true
            setTimeout(this.getFeedbackRecords, 2000)
        },
@@ -67,10 +69,17 @@ export default {
            getFeedback: 'feedback/getFeedback',
        }),
 
+       ...mapMutations({
+           setTab: 'navigation/setTab',
+           setFeedbackSelected: 'feedback/setFeedbackSelected',
+       }),
+
        async getFeedbackRecords () {
+           console.log('getting feedback...')
            try {
                const { data } = await this.getFeedback();
-               this.feedbackRecords = data
+            //    console.log(data);
+               this.feedbackRecords = data;
            } catch (error) {
                if(error.response) console.log(error.response);
                console.log(error);
@@ -78,6 +87,17 @@ export default {
 
            this.overlay = false;
        },
+
+       async feedbackReplies () {
+           try {
+               const { data } = await this.getFeedbackReplies();
+               return data;
+           } catch (error) {
+               if(error.response) console.log(error.response);
+               console.log(error);
+           }
+           
+       }
 
        
        

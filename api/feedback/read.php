@@ -20,9 +20,11 @@
 
     $feedback = new Feedback($conn);
     $data = json_decode(file_get_contents("php://input"));
-    $feedback->patient_id = $data->patient_id;
-    
-    $stmt = $feedback->read();
+    $feedback->patient_id = isset($data->patient_id) ? $data->patient_id : null;
+    $feedback->doctor_id = isset($data->doctor_id) ? $data->doctor_id: null;
+
+    if($data->doctor_id) $stmt = $feedback->readDoctor();
+    else $stmt = $feedback->read();
     $num = $stmt->rowCount();
 
 
@@ -33,15 +35,21 @@
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
             
             extract($row);
+            $replies = array();
+            $stmtReplies = $feedback->replies($id);
+            while($rowReplies = $stmtReplies->fetch(PDO::FETCH_ASSOC)){
+                $replies[] = $rowReplies;
+            }
 
             $records[] = array(
                 "id" => $id,
                 "name" => $name,                
                 "email" => $email,
                 "contact" => $contact,
-                "doctor" => $doctor,
+                "doctor" => $first_name." ".$last_name,
                 "subject" => $subject,
                 "description" => $description,
+                "replies" => $replies,
             );
 
         }
