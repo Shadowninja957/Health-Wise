@@ -29,6 +29,9 @@
             <p>Select Date and Time for Appointment</p>
         </v-row>
         <v-row justify="center">
+            <v-alert type="info">Please Select Date First.</v-alert>
+        </v-row>
+        <v-row justify="center">
             <p class="font-weight-bold">Dr. {{ doctor.name }}</p>
         </v-row>
         <v-row justify="center">
@@ -43,9 +46,12 @@
                 <v-select
                     v-model="appointment.time"
                     :items="timeSlots"
+                    item-value="time"
+                    item-text="display"
                     label="Select an Available Time"
                     outlined
                     class="mt-4"
+                    :disabled="disabledTime"
                 ></v-select>
                 <v-textarea
                     v-model="appointment.details"
@@ -64,15 +70,28 @@
                 Make Appointment
             </v-btn>
         </v-row>
+        <v-overlay
+            :value="overlay"
+        >
+            <v-progress-circular
+                indeterminate
+                size="64"
+            ></v-progress-circular>
+        </v-overlay>
     </v-container>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 export default {
+
+    mounted: function () {
+        this.initialize();
+    },
+
     data: () => ({
         date: "",
-        timeSlots:["11:00 am", "12:00 am", "1:00 pm", "2:00 pm"],
+        timeSlots:[],
         appointment:{
             patient_id: null,
             doctor_id: null,
@@ -82,7 +101,19 @@ export default {
         },
         appointmentError: false,
         appointmentCreated: false,
+        disabledTime: true,
+        overlay: false,
     }),
+
+    watch: {
+        date: function (val) {
+            if(val){
+                // console.log('date selected');
+                this.getAppointments();
+            } 
+            else console.log('no date selected');
+        }
+    },
 
     computed: {
         ...mapGetters({
@@ -103,7 +134,28 @@ export default {
 
         ...mapActions({
             setAppointment: 'appointment/setAppointment',
+            getDoctorAppointments: 'doctor/getDoctorAppointments',
         }),
+
+        initialize () {
+            // console.log(this.doctor);
+            let { hours } = this.doctor;
+            let startTime = new Date("01/01/2022 " + hours[0].start_time);
+            let endTime = new Date("01/01/2022 " + hours[0].end_time);
+            // let hourDiff = endTime.getHours() - startTime.getHours();
+            // console.log(endTime.getHours());
+            // console.log(hourDiff);
+            for(let i = startTime.getHours(); i <= endTime.getHours(); i++){
+                let meridiem = i < 12 ? 'am' : 'pm';
+                let hour = i <= 12 ? i : i-12;
+                let h = i < 10 ? "0" + i : i;
+                this.timeSlots.push({
+                    time: h + ":00:00",
+                    display: hour + ":00 " + meridiem
+                })
+            }
+            // console.log(this.timeSlots);
+        },
 
         allowedDates () {
             // let selectedMonth = parseInt(val.split('-')[1]);
@@ -150,6 +202,34 @@ export default {
                 this.appointmentError = true;
             }
             this.$emit("loading", false);
+        },
+
+        async getAppointments () {
+            this.appointment.patient_id = this.patientId;
+            this.appointment.doctor_id = this.doctor.id;
+            this.appointment.date = this.date;
+            this.setAppointmentDetails(this.appointment);
+            this.overlay = true;
+            try {
+                const { data } = await this.getDoctorAppointments();
+                if(data.length != 0) this.setAllowedTimes(data)
+                this.disabledTime = false;
+            } catch (error) {
+                if(error.response) console.log(error.response);
+                else console.log(error);
+            }
+            setTimeout(() => {
+                this.overlay = false;
+            }, 2000)
+        },
+
+        setAllowedTimes (data) {
+            data.forEach(appointment => {
+                let { time } = appointment;
+                this.timeSlots = this.timeSlots.filter(value => {
+                    if(value.time != time) return value;
+                })
+            });
         }
     }
 }

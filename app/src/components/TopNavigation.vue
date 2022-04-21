@@ -18,7 +18,6 @@
             slider-color="white"
         >
             <v-tab
-                v-if="!doctor"
                 href="/home"
             >
                 Home               
@@ -214,8 +213,8 @@ export default {
         signout () {
             this.setAuthenticated(false);
             this.setDoctor();
-            this.setPatientId();
-            this.setDoctorId();
+            this.setPatientId(null);
+            this.setDoctorId(null);
             sessionStorage.clear();
             console.log(`Doctor: ${this.doctor}`);
             this.$router.replace('/')

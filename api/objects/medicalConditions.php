@@ -16,8 +16,10 @@
             // $query = "select * FROM ".$this->table_name." 
             // WHERE MATCH(symptoms) AGAINST ('".$this->search_phrase."')";
 
-            $query = "select * FROM ".$this->table_name." 
-            WHERE symptoms like '%".$this->search_phrase."%'";
+            // $query = "select * FROM ".$this->table_name." 
+            // WHERE symptoms like '%".$this->search_phrase."%'";
+
+            $query = "SELECT * FROM ".$this->table_name;
             
             $stmt = $this->conn->prepare($query);
 

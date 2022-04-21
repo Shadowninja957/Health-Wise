@@ -67,17 +67,19 @@
                             readonly
                             v-bind="attrs"
                             v-on="on"
-                            
                         ></v-text-field>
                     </template>
                     <v-date-picker
                         v-model="rescheduleAppointment.date"
                         @input="menu = false"
+                        @change="newDate"
                     ></v-date-picker>
                 </v-menu>
                 <v-select
                     v-model="rescheduleAppointment.time"
                     :items="timeSlots"
+                    item-value="time"
+                    item-text="display"
                     label="Time"
                     prepend-icon="mdi-clock-outline"
                     class="mt-4"
@@ -116,7 +118,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 export default {
     props: {
         openDialog: {
@@ -134,12 +136,19 @@ export default {
     computed: {
         dialog: function () {
             return this.openDialog;
-        }
+        },
+
+        ...mapGetters({
+            doctor: 'doctor/getSelectedDoctor',
+        })
     },
 
     watch: {
         openDialog: function (val) {
-            if(val) this.rescheduleAppointment = this.appointment
+            if(val){
+                this.rescheduleAppointment = this.appointment;
+                this.initialize();
+            } 
         }
     },
 
@@ -149,17 +158,63 @@ export default {
         menu: false,
         rescheduleAppointment: {},
         overlay: false,
-        timeSlots:["11:00 am", "12:00 am", "1:00 pm", "2:00 pm"],
+        timeSlots:[],
     }),
 
     methods: {
         ...mapActions({
             updateAppointment: 'appointment/updateAppointment',
+            getDoctorAppointments: 'doctor/getDoctorAppointments',
+            getDoctorHours: 'doctor/getDoctorHours',
         }),
 
         ...mapMutations({
             setAppointmentDetails: 'appointment/setAppointmentDetails',
+            setSelectedDoctor: 'doctor/setSelectedDoctor',
         }),
+
+        async initialize () {
+            console.log('reshedule appointment');
+            this.timeSlots = [];
+            let { doctor_id } = this.rescheduleAppointment;
+            this.setSelectedDoctor({
+                id: doctor_id
+            });
+            try {
+                const { data: hours } = await this.getDoctorHours();
+                let startTime = new Date("01/01/2022 " + hours[0].start_time);
+                let endTime = new Date("01/01/2022 " + hours[0].end_time);
+                for(let i = startTime.getHours(); i <= endTime.getHours(); i++){
+                    let meridiem = i < 12 ? 'am' : 'pm';
+                    let hour = i <= 12 ? i : i-12;
+                    let h = i < 10 ? "0" + i : i;
+                    this.timeSlots.push({
+                        time: h + ":00:00",
+                        display: hour + ":00 " + meridiem
+                    })
+                }
+                console.log(this.rescheduleAppointment);
+                this.setAppointmentDetails(this.rescheduleAppointment);
+                const { data: appointments } = await this.getDoctorAppointments();
+                // console.log(appointments)
+                if(appointments.length != 0) this.setAllowedTimes(appointments)
+            } catch (error) {
+                if(error.response) console.log(error.response);
+                else console.log(error); 
+            }
+        },
+
+        setAllowedTimes (data) {
+            let { time: appointmentTime } = this.rescheduleAppointment;
+            console.log(appointmentTime);
+            data.forEach(appointment => {
+                let { time } = appointment;
+                this.timeSlots = this.timeSlots.filter(value => {
+                    if(value.time == appointmentTime) return value;
+                    if(value.time != time) return value;
+                })
+            });
+        },
 
         async confirmReschedule () {
             this.overlay = true;
@@ -186,6 +241,11 @@ export default {
             this.$emit('close-reschedule')
             this.appointmentUpdated = false;
             this.appointmentUpdateError = null;
+        },
+
+        newDate () {
+            console.log('date changed')
+            this.initialize();
         }
     }
 }

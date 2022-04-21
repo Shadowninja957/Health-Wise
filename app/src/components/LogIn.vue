@@ -49,6 +49,7 @@
                                 :append-icon="show? 'mdi-eye' : 'mdi-eye-off'"
                                 :type="show ? 'text' : 'password'"
                                 @click:append="show = !show"
+                                @keydown="keyCheck"
                                 outlined
                             ></v-text-field>
                             <v-card-actions>
@@ -115,6 +116,12 @@ export default {
             this.$router.replace('/signup')
         },
 
+        keyCheck ({ keyCode }) {
+            if(keyCode == 13){
+                this.signin();
+            }
+        },
+
         async signin ()
         {
             if(this.email && this.password)
@@ -134,27 +141,26 @@ export default {
                     let dataUser = null;
                     console.log(`RoleID: ${data.data[0].role_id}`)
                     if(data.data[0].role_id == 2){
+                        //doctor
                         const { data } = await this.getDoctor();
                         // console.log(data);
-                        dataUser = data;
-                        this.setUser(JSON.stringify(dataUser[0]));
-                        sessionStorage.setItem('User', JSON.stringify(dataUser[0]));
+                        this.setUser(JSON.stringify(data[0]));
+                        sessionStorage.setItem('User', JSON.stringify(data[0]));
                         sessionStorage.setItem('Authenticated', "true");
                         this.setDoctor(true);
-                        this.setDoctorId(dataUser[0].id);
-                        sessionStorage.setItem('DoctorId',dataUser[0].id )
+                        this.setDoctorId(data[0].id);
+                        sessionStorage.setItem('DoctorId',data[0].id )
                         sessionStorage.setItem('Doctor', true);
                         this.$router.replace('/home')
                     } 
                     else{
                         const { data } = await this.getPatient();
                         dataUser = data;
-                        this.setUser(dataUser[0]);
+                        this.setUser(JSON.stringify(dataUser[0]));
                         sessionStorage.setItem('User', JSON.stringify(dataUser[0]));
                         sessionStorage.setItem('Authenticated', "true");
                         this.setPatientId(dataUser[0].id);
                         sessionStorage.setItem('PatientId',dataUser[0].id )
-                        // console.log(`patient id: ${this.patientId}`)
                         this.$router.replace('/home')
                     } 
                     

@@ -13,11 +13,14 @@
         public $work_address;
         public $email_address;
         public $contact_number;
-        public $work_days;
+        public $office_days;
         public $work_hours;
         public $speciality_id;
         public $location_lat;
         public $location_lng;
+        public $date;
+        public $start_time;
+        public $end_time;
         
         
         public function __construct($conn){
@@ -113,6 +116,57 @@
             }
 
             return false;
+        }
+
+        function updateOfficeHours($id, $day, $start_time, $end_time)
+        {
+            $query = "UPDATE doctor_hours SET start_time = ".$start_time.
+            ", end_time = ".$end_time.", updated_at = CURRENT_TIMESTAMP".
+            "WHERE doctor_id = ".$id." AND day = ".$day;
+            $stmt = $this->conn->prepare($query);
+            if($stmt->execute())return true;
+            return false;
+        }
+
+        function addOfficeHours ($id, $day, $start_time, $end_time)
+        {
+            $query = "INSERT INTO doctor_hours(doctor_id, day, start_time, end_time, created_at, updated_at) ".
+            " VALUES (".$id.",".$day.",".$start_time.",".$end_time.", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+            $stmt = $this->conn->prepare($query);
+            if($stmt->execute()) return true;
+            return false; 
+        }
+        
+        function deleteOfficeHours ($id, $day)
+        {
+            $query = "DELETE FROM doctor_hours WHERE doctor_id = ".$id.
+            "AND day =".$day;
+            $stmt = $this->conn->prepare($query);
+            if($stmt->execute()) return true;
+            return false;
+        }
+
+        function getAppointments ()
+        {
+            $query = "SELECT * FROM appointments WHERE date = '".$this->date."'".
+            " AND doctor_id = ".$this->id;
+
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute();
+
+            return $stmt;
+        }
+
+        function getHours ($id)
+        {
+            $query = "SELECT * FROM doctor_hours WHERE doctor_id = ".$id;
+
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute();
+
+            return $stmt;
         }
     }
 ?>

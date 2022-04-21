@@ -60,12 +60,20 @@
                                     @input="menu = false"
                                 ></v-date-picker>
                             </v-menu>
-                            <v-text-field
+                            <!-- <v-text-field
                                 v-model="profile.email_address"
                                 label="Email Address"
+                                disabled
+                                filled
+                            ></v-text-field> -->
+                            <v-text-field
+                                v-if="doctor"
+                                v-model="profile.work_number"
+                                label="Phone Number"
                             ></v-text-field>
                             <v-text-field
-                                v-model="profile.work_number"
+                                v-else
+                                v-model="profile.contact_number"
                                 label="Phone Number"
                             ></v-text-field>
                             
@@ -78,6 +86,11 @@
                         <v-card-text class="pb-0">
                             <v-select
                                 label="Speciality"
+                                v-model="profile.speciality_id"
+                                :items="specialities"
+                                item-text="detail"
+                                item-value="id"
+                                clearable
                             ></v-select>
                             <v-text-field
                                 v-model="profile.work_address"
@@ -103,11 +116,11 @@
                             <v-row>
                                 <v-col cols="6">
                                     <v-menu
-                                        ref="menu"
+                                        ref="menu1"
                                         v-model="menuTimeStart"
                                         :close-on-content-click="false"
                                         :nudge-right="40"
-                                        :return-value.sync="profile.time_start"
+                                        :return-value.sync="profile.start_time"
                                         transition="scale-transition"
                                         offset-y
                                         max-width="290px"
@@ -115,7 +128,7 @@
                                     >
                                         <template v-slot:activator="{ on, attrs }">
                                             <v-text-field
-                                                v-model="profile.time_start"
+                                                v-model="profile.start_time"
                                                 label="Start Time"
                                                 readonly
                                                 v-bind="attrs"
@@ -124,19 +137,19 @@
                                         </template>
                                         <v-time-picker
                                             v-if="menuTimeStart"
-                                            v-model="profile.time_start"
+                                            v-model="profile.start_time"
                                             full-width
-                                            @click:minute="$refs.menu.save(profile.time_start)"
+                                            @click:minute="$refs.menu1.save(profile.start_time)"
                                         ></v-time-picker>    
                                     </v-menu>
                                 </v-col>
                                 <v-col cols="6">
                                     <v-menu
-                                        ref="menu"
-                                        v-model="menuTimeStart"
+                                        ref="menu2"
+                                        v-model="menuTimeEnd"
                                         :close-on-content-click="false"
                                         :nudge-right="40"
-                                        :return-value.sync="profile.time_start"
+                                        :return-value.sync="profile.end_time"
                                         transition="scale-transition"
                                         offset-y
                                         max-width="290px"
@@ -144,7 +157,7 @@
                                     >
                                         <template v-slot:activator="{ on, attrs }">
                                             <v-text-field
-                                                v-model="profile.time_start"
+                                                v-model="profile.end_time"
                                                 label="End Time"
                                                 readonly
                                                 v-bind="attrs"
@@ -152,10 +165,10 @@
                                             ></v-text-field>
                                         </template>
                                         <v-time-picker
-                                            v-if="menuTimeStart"
-                                            v-model="profile.time_start"
+                                            v-if="menuTimeEnd"
+                                            v-model="profile.end_time"
                                             full-width
-                                            @click:minute="$refs.menu.save(profile.time_start)"
+                                            @click:minute="$refs.menu2.save(profile.end_time)"
                                         ></v-time-picker>    
                                     </v-menu>
                                 </v-col>
@@ -163,7 +176,28 @@
 
                             <v-combobox
                                 label="Office Days"
-                            ></v-combobox>
+                                v-model="officeDays"
+                                :items="days"
+                                multiple
+                                chips
+                            >
+                                <template v-slot:selection="data">
+                                    <v-chip
+                                        :key="JSON.stringify(data.item)"
+                                        v-bind="data.attrs"
+                                        :input-value="data.selected"
+                                        @click:close="data.parent.selectItem(data.item)"
+                                    >
+                                        <v-avatar
+                                            class="accent white--text"
+                                            left
+                                            v-text="data.item.slice(0, 2)"
+                                        ></v-avatar>
+                                        {{ data.item }}
+                                    </v-chip>
+
+                                </template>
+                            </v-combobox>
                             
                         </v-card-text>    
                     </v-card>
@@ -189,7 +223,31 @@
                     Update
                 </v-btn>
             </v-card-actions>
+             <v-overlay
+                :value="overlay"
+            >
+                <v-progress-circular
+                    indeterminate
+                    size="64"
+                ></v-progress-circular>
+            </v-overlay>
         </v-card>
+        <v-snackbar
+            v-model="snackbar.display"
+            :color="snackbar.color"
+        >
+            {{ snackbar.text }}
+            <template v-slot:action="{ attrs }">
+                <v-btn
+                    color="white"
+                    text
+                    v-bind="attrs"
+                    @click="snackbar.display = false"
+                >
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
     </v-dialog>
 </template>
 
@@ -221,6 +279,7 @@ export default {
         }),
 
         user () {
+            // console.log(this.getUser);
             return JSON.parse(this.getUser);
         }
     },
@@ -228,13 +287,37 @@ export default {
     data: function () {
         return {
             tab: null,
-            profile: {},
+            profile: {
+                first_name: '',
+                last_name: '',
+                gender: '',
+                date_of_birth: null,
+                contact_number: null,
+            },
             menu: false,
             menuTimeStart: false,
+            menuTimeEnd: false,
             genders: [
                 { abbr: "M", detail: "Male" },
                 { abbr: "F", detail: "Female" },
             ],
+            snackbar: {
+                display: false,
+                text: null,
+                color: 'primary',
+            },
+            overlay: false,
+            days: [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday'
+            ],
+            officeDays: [],
+            specialities: [],
         }
     },
 
@@ -242,32 +325,73 @@ export default {
         ...mapMutations({
             setDoctorProfile: 'doctor/setDoctorProfile',
             setUser: 'auth/setUser',
+            setPatientProfile: 'patient/setProfile',
         }),
 
         ...mapActions({
             postUpdateDoctor: 'doctor/postUpdate',
+            postUpdatePatient: 'patient/postProfile',
+            getSpecialities: 'doctor/getDoctorSpecialities',
         }),
 
-        initialize () {
+        async initialize () {
             console.log('initializing profile...')
-            // console.log(this.user);
+            try {
+                const { data } = await this.getSpecialities();
+                this.specialities = data;
+            } catch (error) {
+                if(error.response) console.log(error.response);
+                else console.log(error)
+            }
             this.profile = {...this.user};
-            console.log(`Doctor: ${this.doctor}`)
-            
+            console.log(`Doctor: ${this.doctor}`)            
         },
 
         async updateProfile () {
             // console.log(this.profile)
+            console.log(this.officeDays);
+            this.profile.office_days = this.officeDays
+            this.overlay = true;
             try {
-                this.setDoctorProfile(this.profile);
-                const { data: { doctor } } = await this.postUpdateDoctor();
-                console.log(doctor);
-                this.setUser(JSON.stringify(doctor))
-                sessionStorage.setItem('User', JSON.stringify(doctor));
+                if(this.doctor){
+                    this.setDoctorProfile(this.profile);
+                    const { data: { doctor } } = await this.postUpdateDoctor();
+                    this.snackbar.text = "Profile updated successfully."
+                    this.snackbar.color = "primary"
+                    // this.snackbar.display = true;
+                    // console.log(doctor);
+                    this.setUser(JSON.stringify(doctor))
+                    sessionStorage.setItem('User', JSON.stringify(doctor));
+                    setTimeout(() => {
+                        this.snackbar.display = true;
+                        this.overlay = false;
+                    }, 2000)
+                    return;
+                }
+                
+                this.profile.contact_number = this.profile.work_number;
+                this.setPatientProfile(this.profile);
+                const { data: { patient }} = await this.postUpdatePatient();
+                console.log(patient);
+                let user = {...this.user, ...patient};
+                // console.log(user);
+                this.setUser(JSON.stringify(user));
+                sessionStorage.setItem('User', JSON.stringify(user));
+                this.snackbar.text = "Profile updated successfully."
+                this.snackbar.color = "primary"
+
+                
             } catch (error) {
                 if(error.response) console.log(error.response);
                 else console.log(error);
+                this.snackbar.text = "Error occurred. Profile not updated";
+                this.snackbar.color = "red"
+                // this.snackbar.display = true;
             }
+            setTimeout(() => {
+                this.snackbar.display = true;
+                this.overlay = false;
+            }, 2000)
         },
 
         close () {

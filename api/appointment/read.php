@@ -68,7 +68,9 @@
                     "speciality" => $speciality,
                     "cancel" => $cancel,
                     "location_lat" => $location_lat,
-                    "location_lng" => $location_lng
+                    "location_lng" => $location_lng,
+                    "doctor_id" => $doctor_id,
+                    "patient_id" => $patient_id,
                 );
             }
             else{
@@ -86,22 +88,12 @@
 
            
 
-        }
-
-        http_response_code(200);
-
-        echo json_encode($records);
+        }       
     }
-    else{
-        
-        http_response_code(404);
-
-        echo json_encode(
-            array("message" => "No appointments found.")
-        );
-    }
-
     
+    http_response_code(200);
+
+    echo json_encode($records);    
     
 
 ?>

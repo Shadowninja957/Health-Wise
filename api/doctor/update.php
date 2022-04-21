@@ -38,11 +38,28 @@
         $doctor->work_address = $data->work_address;
         $doctor->email_address = $data->email_address;
         $doctor->work_number = $data->work_number;
-        // $doctor->work_days = $data->work_days;
+        $doctor->office_days = $data->office_days;
+        $doctor->start_time = $data->start_time;
+        $doctor->end_time = $data->end_time;
         // $doctor->work_hours = $data->work_hours;
         $doctor->speciality_id = $data->speciality_id;
         $doctor->location_lat = $data->location_lat;
         $doctor->location_lng = $data->location_lng;
+
+        $doctor_info = $doctor->update();
+
+        $current_office_hours = $doctor->getHours($data->id);
+        $num = $current_office_hours->rowCount();
+
+        if($current_office_hours > 0){
+            
+            // foreach($data->office_days as $office_day){
+            //     switch ($office_day){
+            //         case 'Sunday':
+
+            //     }
+            // }
+        }
 
         if($doctor->update()){
 

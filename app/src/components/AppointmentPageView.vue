@@ -58,7 +58,8 @@
                         <div>Email: {{ appointment.email_address }}</div>
                         <div>Place of Work: {{ appointment.work_address }}</div>
                         <div class="font-weight-bold mt-3">Appointment Date and Time</div>
-                        <div>{{ appointment.date }}, {{ appointment.time }}</div>
+                        <!-- <div>{{ appointment.date }}, {{ appointment.time }}</div> -->
+                        <div>{{ appointmentDateTime(appointment) }}</div>
                         <div class="font-weight-bold mt-3">Reason for appointment</div>
                         <div>{{ appointment.details }}</div>
                     </v-card-text>
@@ -134,6 +135,9 @@ import GoogleMaps from './GoogleMaps.vue';
 import AppointmentReschedule from './AppointmentReschedule.vue';
 import AppointmentCancel from './AppointmentCancel.vue';
 import AppointmentDoctor from './AppointmentDoctor.vue';
+// import moment from "moment";
+import { format } from 'date-fns';
+
 export default {
     components: {
         GoogleMaps,
@@ -150,7 +154,7 @@ export default {
         ...mapGetters({
             doctorId: 'auth/getDoctorId',
             patientId: 'auth/getPatientId',
-        })
+        }),        
     },
 
     data: () => ({
@@ -169,13 +173,13 @@ export default {
         }),
 
         async initialize () {
-            console.log(`Dr ID: ${this.doctorId}`);
-            console.log(`Paitent ID: ${this.patientId}`);
+            // console.log(`Dr ID: ${this.doctorId}`);
+            // console.log(`Paitent ID: ${this.patientId}`);
             this.$emit("loading", true);
             // console.log('initializing appointments...');
             try {
                 const { data } = await this.getAppointments();
-                console.log(data);
+                // console.log(data);
                 this.appointments = data;
             } catch (error) {
                 console.log(error);
@@ -186,7 +190,7 @@ export default {
 
         reschedule (appointment) {
             this.rescheduleAppointment = appointment;
-            console.log(this.rescheduleAppointment);            
+            // console.log(this.rescheduleAppointment);            
             this.dialogReschedule = true;
         },
 
@@ -206,6 +210,14 @@ export default {
 
         appointmentCancelled () {
             this.appointmentSelected.cancel = 1;
+        },
+
+        appointmentDateTime (appointment) {
+            // console.log(appointment);
+            let datetime = new Date(appointment.date + ' ' + appointment.time)
+            // console.log(format(datetime, 'EEEE do MMM yyyy hh:mm a'));
+            // console.log(moment(datetime).format("dddd Do MMM YYYY LLL"))
+            return format(datetime, 'EEEE do MMM yyyy h:mm a')
         }
 
         

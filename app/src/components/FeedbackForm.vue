@@ -184,7 +184,7 @@ export default {
            this.setTab(4)
            this.overlay = true;
            let user = JSON.parse(this.getUser);
-           console.log(user);
+        //    console.log(user);
            this.feedback.name = user.first_name + " " + user.last_name;
            this.feedback.patient_id = user.id;
            this.feedback.email = this.userEmail;

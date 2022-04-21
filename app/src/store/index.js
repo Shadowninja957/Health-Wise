@@ -7,6 +7,7 @@ import appointment from './appointment'
 import feedback from './feedback'
 import navigation from './navigation'
 import diagnosis from './diagnosis'
+import patient from './patient'
 import * as VueGoogleMaps from 'vue2-google-maps'
 
 // axios.defaults.withCredentials = true
@@ -29,6 +30,7 @@ export default new Vuex.Store({
         appointment,
         feedback,
         navigation, 
-        diagnosis,        
+        diagnosis,
+        patient,        
     }
 })

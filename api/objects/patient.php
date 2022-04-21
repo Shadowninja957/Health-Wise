@@ -50,5 +50,34 @@
 
             return false;
         }
+
+        function update() 
+        {
+            $query = "UPDATE ".$this->table_name." SET first_name=:first_name,
+            last_name=:last_name, date_of_birth=:date_of_birth, gender=:gender,
+            contact_number=:contact_number,updated_at=CURRENT_TIMESTAMP
+            WHERE id=:id";
+
+            $stmt = $this->conn->prepare($query);
+
+            $this->first_name=htmlspecialchars(strip_tags($this->first_name));
+            $this->last_name=htmlspecialchars(strip_tags($this->last_name));
+            $this->date_of_birth= $this->date_of_birth ? htmlspecialchars(strip_tags($this->date_of_birth)) : null;
+            $this->gender=htmlspecialchars(strip_tags($this->gender));
+            $this->contact_number=htmlspecialchars(strip_tags($this->contact_number));
+
+            $stmt->bindParam(":id", $this->id);
+            $stmt->bindParam(":first_name", $this->first_name);
+            $stmt->bindParam(":last_name", $this->last_name);
+            $stmt->bindParam(":date_of_birth", $this->date_of_birth);
+            $stmt->bindParam(":gender", $this->gender);
+            $stmt->bindParam(":contact_number", $this->contact_number);
+
+            if($stmt->execute()){
+                return true;
+            }
+
+            return false;
+        }
     }
 ?>

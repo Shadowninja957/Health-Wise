@@ -26,7 +26,11 @@
             extract($row);
 
             $age = date_diff(date_create($date_of_birth), date_create());
-
+            $hours = array();
+            $stmtHours = $doctor->getHours($id);
+            while($rowHours = $stmtHours->fetch(PDO::FETCH_ASSOC)){
+                $hours[] = $rowHours;
+            }
 
             $records[] = array(
                 "id" => $id,
@@ -38,6 +42,7 @@
                 "speciality" => $detail,
                 "location_lat" => $location_lat,
                 "location_lng" => $location_lng,
+                "hours" => $hours,
             );
 
         }

@@ -5,15 +5,15 @@
     header("Access-Control-Allow-Headers: Origin, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
     include_once '../config/database.php';    
-    include_once '../objects/patient.php';
+    include_once '../objects/doctor.php';
 
     $database = new Database();
     $conn = $database->getConnection();
     
 
-    $patient = new Patient($conn);
+    $doctor = new Doctor($conn);
     $data = json_decode(file_get_contents("php://input"));
-    $patient->user_id = $data->user_id;
+    $doctor->id = $data->id;
 
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         // The request is using the POST method
@@ -23,9 +23,8 @@
     }
     
 
-    $stmt = $patient->read();
+    $stmt = $doctor->getHours($data->id);
     $num = $stmt->rowCount();
-
 
     if($num > 0){
 
@@ -37,13 +36,9 @@
 
             $records[] = array(
                 "id" => $id,
-                "first_name" => $first_name,
-                "last_name" => $last_name,
-                "gender" => $gender,
-                "date_of_birth" => $date_of_birth,                
-                "contact_number" => $contact_number,
-                "address" => $address,
-                "role_id" => 1,
+                "day" => $day,
+                "start_time" => $start_time,
+                "end_time" => $end_time,
             );
 
         }
@@ -57,7 +52,7 @@
         http_response_code(404);
 
         echo json_encode(
-            array("message" => "No users found.")
+            array("message" => "No work hours found.")
         );
     }
 

@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import { format } from 'date-fns';
 export default {
     props: {
         appointmentsAll: {
@@ -89,7 +90,10 @@ export default {
         
         appointmentsFilter () {
             this.appointments = this.appointmentsAll.filter(value => {
-                if(value.date == this.date) return value;
+                if(value.date == this.date){
+                    value.time = format(new Date("2022-04-21 " + value.time), "h:mm a")
+                    return value;
+                }
             })
         }
     }

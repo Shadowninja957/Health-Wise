@@ -57,12 +57,12 @@
                                 hide-details=""
                             ></v-text-field>
                             <v-card-actions class="flex-column justify-start">
-                                <div>
+                                <!-- <div>
                                     <v-checkbox
                                         label="Doctor"
                                         v-model="doctor"
                                     ></v-checkbox>
-                                </div>    
+                                </div>     -->
                                 <div class="d-flex">
                                     <v-checkbox
                                         label="I agree to Terms & Conditions"
@@ -207,6 +207,8 @@ export default {
                     else{
                         await this.postPatient();
                         const { data } = await this.getPatient();
+                        console.log(data);
+                        sessionStorage.setItem('PatientId',data[0].id )
                         dataUser = data;
                     } 
                     this.setUser(dataUser[0]);

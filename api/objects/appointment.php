@@ -34,7 +34,8 @@
                 " doctors.email_address, doctors.work_number, doctors.speciality_id, ".
                 " doctors.location_lat, doctors.location_lng ".
                 " FROM ".$this->table_name." INNER JOIN doctors ".
-                " ON ".$this->table_name.".doctor_id = doctors.id ".                
+                " ON ".$this->table_name.".doctor_id = doctors.id ".
+                " WHERE patient_id = ".$this->patient_id.               
                 " ORDER BY date , time DESC";
             }
             else{
