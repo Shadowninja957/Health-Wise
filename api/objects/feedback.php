@@ -75,8 +75,8 @@
                 return true;
             }
 
-            return false;
-            //return $stmt->errorInfo();
+            // return false;
+            return $stmt->errorInfo();
         }
     }
 ?>

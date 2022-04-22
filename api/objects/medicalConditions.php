@@ -4,7 +4,7 @@
         private $conn;
         private $table_name = "medical_conditions";
         
-        public $search_phrase;
+        // public $search_phrase;
         
         public function __construct($conn){
             $this->conn = $conn;
