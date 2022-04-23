@@ -142,13 +142,14 @@ export default {
 
         filterDoctors () {
             console.log(this.search);
-            this.doctorsSearch = this.doctors.filter(this.checkDoctor);
+            this.doctorsSearch = this.doctors.filter(value => this.checkDoctor(value));
         },
 
         checkDoctor (doctor) {
+            // console.log(doctor);
             if(
-                doctor.name.toLowerCase().indexOf(this.search) !== -1 ||
-                doctor.speciality.toLowerCase().includes(this.search)
+                (doctor.name && doctor.name.toLowerCase().indexOf(this.search) !== -1) ||
+                (doctor.speciality && doctor.speciality.toLowerCase().includes(this.search))
             ) 
             return true;
             return false;
