@@ -42,6 +42,7 @@
         $feedback->subject = $data->subject;
         $feedback->description = $data->description;
         
+        // echo json_encode($feedback->create());
 
         if($feedback->create()){
 

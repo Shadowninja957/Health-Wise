@@ -69,7 +69,7 @@
                             <v-text-field
                                 v-if="doctor"
                                 v-model="profile.work_number"
-                                label="Phone Number"
+                                label="Work Number"
                             ></v-text-field>
                             <v-text-field
                                 v-else
@@ -369,7 +369,7 @@ export default {
                     return;
                 }
                 
-                this.profile.contact_number = this.profile.work_number;
+                // this.profile.contact_number = this.profile.work_number;
                 this.setPatientProfile(this.profile);
                 const { data: { patient }} = await this.postUpdatePatient();
                 console.log(patient);

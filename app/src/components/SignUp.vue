@@ -143,6 +143,9 @@ export default {
             setUserId: 'auth/setUserId',
             setUser: 'auth/setUser',
             setUserEmail: 'auth/setUserEmail',
+            setDoctor: 'auth/setDoctor',
+            setDoctorId: 'auth/setDoctorId',
+            setPatientId: 'auth/setPatientId',
         }),
 
         back ()
@@ -203,15 +206,20 @@ export default {
                         await this.postDoctor();
                         const { data } = await this.getDoctor();
                         dataUser = data;
+                        this.setDoctorId(data[0].id);
+                        sessionStorage.setItem('DoctorId',data[0].id )
+                        this.setDoctor(true);
+                        sessionStorage.setItem('Doctor', true);
                     } 
                     else{
                         await this.postPatient();
                         const { data } = await this.getPatient();
-                        console.log(data);
+                        console.log(data);                       
                         sessionStorage.setItem('PatientId',data[0].id )
                         dataUser = data;
+                        this.setPatientId(data[0].id);
                     } 
-                    this.setUser(dataUser[0]);
+                    this.setUser(JSON.stringify(dataUser[0]));
                     sessionStorage.setItem('User', JSON.stringify(dataUser[0]));
                     // console.log(`Authenticated: ${this.authenticated}`);
                     sessionStorage.setItem('Authenticated', "true");

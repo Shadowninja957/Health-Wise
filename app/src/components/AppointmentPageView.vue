@@ -16,6 +16,8 @@
                     <v-text-field
                         clearable
                         placeholder="Search Dr. Name / Speciality"
+                        v-model="search"
+                        @keydown="filterAppointments"
                         outlined
                         hide-details
                     ></v-text-field>                    
@@ -27,7 +29,7 @@
         <v-row v-if="patientId">
             <v-col 
                 
-                v-for="appointment in appointments"
+                v-for="appointment in appointmentSearch"
                 :key="appointment.id"
             >
                 <v-card 
@@ -159,12 +161,14 @@ export default {
 
     data: () => ({
         appointments: [],
+        appointmentSearch: [],
         dialogReschedule: false,
         dialogCancel: false,
         rescheduleAppointment: {},
         appointmentSelected: {
             cancel: 0,
         },
+        search: "",
     }),
 
     methods: {
@@ -181,6 +185,7 @@ export default {
                 const { data } = await this.getAppointments();
                 // console.log(data);
                 this.appointments = data;
+                this.appointmentSearch = data;
             } catch (error) {
                 console.log(error);
                 console.log(error.response);
@@ -218,7 +223,20 @@ export default {
             // console.log(format(datetime, 'EEEE do MMM yyyy hh:mm a'));
             // console.log(moment(datetime).format("dddd Do MMM YYYY LLL"))
             return format(datetime, 'EEEE do MMM yyyy h:mm a')
+        },
+
+        filterAppointments () {
+            console.log(this.search);
+            this.appointmentSearch = this.appointments.filter(value => {
+                if(
+                    value.name && value.name.toLowerCase().indexOf(this.search) !== -1 ||
+                    value.speciality && value.speciality.toLowerCase().includes(this.search)
+                )
+                return true;
+            })
         }
+
+
 
         
     }
