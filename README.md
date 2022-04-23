@@ -73,4 +73,4 @@ Click GO.
 
 Create a database called health_wise
 
-Now, download the sql in branch and import it in the health-wise database.
+Now, download the sql file "health_wise (1).sql" in branch v1.0 and import it in the health-wise database.
